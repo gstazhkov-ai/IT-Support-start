@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Годовой план развития службы поддержки по ITIL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The SPA is structured around an interactive 12-month timeline, which acts as the primary navigation. This chronological approach best reflects the nature of the source document—a time-based strategic plan. Users can select a time period to filter and view relevant goals, processes, and team changes. Supporting sections for detailed KPI dashboards and an interactive ITIL process library allow for deeper exploration without cluttering the main view. This design was chosen to guide the user through the plan's evolution, making a complex, year-long strategy easy to digest and explore month by month. -->
+    <!-- Visualization & Content Choices: 
+    - Roadmap -> Goal: Show change over time -> Viz: Interactive HTML/CSS timeline -> Interaction: Click a month to filter content -> Justification: Provides a clear, high-level overview and acts as the main navigation control.
+    - KPIs -> Goal: Inform on targets -> Viz: Stat cards with embedded Chart.js bar charts -> Interaction: Hover for details -> Justification: Quickly communicates key success metrics in a visually engaging format.
+    - Team Growth -> Goal: Show change -> Viz: Chart.js Bar Chart -> Interaction: Static display -> Justification: Simple and clear visualization for a small dataset.
+    - ITIL Processes -> Goal: Organize & Explain -> Viz: Grid of clickable cards -> Interaction: Click to show detailed description in a dedicated view -> Justification: Organizes 9 complex processes neatly and allows users to drill down into details on demand, preventing information overload.
+    - CONFIRMATION: NO SVG/Mermaid used. All visuals are HTML/CSS or Chart.js on Canvas. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-height: 250px;
+        }
+        .kpi-chart-container {
+            position: relative;
+            width: 100%;
+            height: 10px;
+        }
+        .timeline-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .timeline-item.active {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .process-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .process-card.active, .process-card:hover {
+            transform: translateY(-5px);
+            border-color: #0ea5e9; /* sky-500 */
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        [x-cloak] { display: none !important; }
+        .section-fade-in {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Годовой план развития службы поддержки</h1>
+            <p class="mt-2 text-lg text-slate-600">Интерактивная дорожная карта внедрения ITIL-процессов</p>
+        </header>
+
+        <main>
+            <!-- KPIs Section -->
+            <section id="kpis" class="mb-12 section-fade-in">
+                <h2 class="text-2xl font-bold mb-6 text-slate-900 text-center">Ключевые цели (KPI) на 6 месяцев</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="font-semibold text-slate-700">SLA Compliance</h3>
+                        <p class="text-3xl font-bold text-sky-600 my-2">&ge; 95%</p>
+                        <div class="kpi-chart-container"><canvas id="slaChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="font-semibold text-slate-700">Customer Satisfaction (CSAT)</h3>
+                        <p class="text-3xl font-bold text-sky-600 my-2">&ge; 90%</p>
+                        <div class="kpi-chart-container"><canvas id="csatChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="font-semibold text-slate-700">First Contact Resolution (FCR)</h3>
+                        <p class="text-3xl font-bold text-sky-600 my-2">&ge; 70%</p>
+                        <div class="kpi-chart-container"><canvas id="fcrChart"></canvas></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="font-semibold text-slate-700">Снижение нагрузки на L3</h3>
+                        <p class="text-3xl font-bold text-sky-600 my-2">&ge; 80%</p>
+                        <div class="kpi-chart-container"><canvas id="l3WorkloadChart"></canvas></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Timeline Section -->
+            <section id="timeline" class="mb-12 section-fade-in" style="animation-delay: 0.2s;">
+                <h2 class="text-2xl font-bold mb-8 text-slate-900 text-center">Дорожная карта на 12 месяцев</h2>
+                <div id="timeline-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                </div>
+            </section>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Team Growth Section -->
+                <div class="lg:col-span-1 section-fade-in" style="animation-delay: 0.4s;">
+                     <h2 class="text-2xl font-bold mb-6 text-slate-900">План найма и роста команды</h2>
+                     <div class="bg-white p-6 rounded-lg shadow-md">
+                        <div class="chart-container">
+                            <canvas id="teamChart"></canvas>
+                        </div>
+                        <p class="text-sm text-slate-600 mt-4">Начальная команда будет состоять из Руководителя, двух специалистов L1 и одного системного администратора L2, набранных в течение первых трёх месяцев.</p>
+                     </div>
+                </div>
+
+                <!-- ITIL Processes Section -->
+                <div class="lg:col-span-2 section-fade-in" style="animation-delay: 0.6s;">
+                    <h2 class="text-2xl font-bold mb-6 text-slate-900">Библиотека ITIL-процессов</h2>
+                    <div id="process-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                    </div>
+                    <div id="process-details" class="bg-white p-6 rounded-lg shadow-md min-h-[200px] transition-opacity duration-500">
+                        <p class="text-slate-500 text-center pt-16">Выберите процесс, чтобы увидеть его детальное описание.</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const data = {
+        kpis: [
+            { id: 'slaChart', label: 'SLA Compliance', value: 95 },
+            { id: 'csatChart', label: 'CSAT', value: 90 },
+            { id: 'fcrChart', label: 'FCR', value: 70 },
+            { id: 'l3WorkloadChart', label: 'Снижение нагрузки на L3', value: 80 }
+        ],
+        team: {
+            labels: ['Месяц 1', 'Месяц 2', 'Месяц 3'],
+            data: [3, 3, 4], // Руководитель + L1 + L2, ..., + второй L1
+            roles: [
+                'Рук. + L1(№1) + L2',
+                'Рук. + L1(№1) + L2',
+                'Рук. + L1(№1) + L2 + L1(№2)',
+            ]
+        },
+        timeline: [
+            { month: 1, name: 'Октябрь', quarter: 1, focus: 'Фундамент и контроль', tasks: 'Запуск Service Desk. Найм L1 (№1) и L2. Утверждение SLA. Разработка регламентов Incident & Request.' },
+            { month: 2, name: 'Ноябрь', quarter: 1, focus: 'Стабилизация и мониторинг', tasks: 'SLA Compliance ≥ 70%. Внедрение Регламента приоритезации. Настройка Zabbix/Prometheus L2.' },
+            { month: 3, name: 'Декабрь', quarter: 1, focus: 'Рост. База знаний', tasks: 'Найм L1 (№2). Запуск Портала самообслуживания. Внедрение Knowledge Management.' },
+            { month: 4, name: 'Январь', quarter: 2, focus: 'Качество. Стандартизация', tasks: 'Публикация Каталога услуг. FCR ≥ 50%. Настройка расчета CSAT.' },
+            { month: 5, name: 'Февраль', quarter: 2, focus: 'Проблемы. RCA', tasks: 'Формальное внедрение Problem Management. L2 проводит RCA по первым P1.' },
+            { month: 6, name: 'Март', quarter: 2, focus: 'Оптимизация. Финал 6 мес.', tasks: 'Снижение нагрузки на L3 ≥ 80%. Тестовый CAB. Отчет за 180 дней.' },
+            { month: 7, name: 'Апрель', quarter: 3, focus: 'Зрелость. Change & ITAM', tasks: 'Внедрение Change Management. Создание CAB. Старт ITAM (заполнение Asset Register).' },
+            { month: 8, name: 'Май', quarter: 3, focus: 'Контроль активов', tasks: 'ITAM: Полная инвентаризация оборудования. Обучение L1 привязке заявок к активам.' },
+            { month: 9, name: 'Июнь', quarter: 3, focus: 'Процессный аудит', tasks: 'Внутренний аудит процессов. Оптимизация FCR. Планирование схемы CMDB.' },
+            { month: 10, name: 'Июль', quarter: 4, focus: 'Архитектура CMDB', tasks: 'Старт Configuration Management (CMDB). Определение и каталогизация 80% критичных CI.' },
+            { month: 11, name: 'Август', quarter: 4, focus: 'Связи и Прогноз', tasks: 'Построение карты зависимостей CI-Сервис. Полная система Proactive Monitoring.' },
+            { month: 12, name: 'Сентябрь', quarter: 4, focus: 'Масштабирование. Итог года', tasks: 'Финальный отчет. План найма и бюджета на 2-й год. Готовность ITAM и CMDB.' }
+        ],
+        processes: [
+            { id: 'incident', name: 'Управление инцидентами', startMonth: 1, details: '<strong>Цель:</strong> Быстрое восстановление работоспособности IT-сервиса. <br><strong>Ключевые артефакты:</strong> Регламент Incident Management, Политика Эскалации. <br><strong>Процесс:</strong> Регистрация → Приоритизация → Первичное Решение (L1) → Эскалация → PIR (Post-Incident Review) после каждого P1 инцидента.' },
+            { id: 'request', name: 'Управление запросами', startMonth: 1, details: '<strong>Цель:</strong> Обработка стандартных, повторяющихся запросов по согласованным процедурам. <br><strong>Ключевые артефакты:</strong> Список типовых запросов, Шаблоны в Service Desk. <br><strong>Процесс:</strong> Подача через Каталог → Автоматическая маршрутизация и согласование → Выполнение по сценарию L1/L2.' },
+            { id: 'monitoring', name: 'Проактивный мониторинг', startMonth: 2, details: '<strong>Цель:</strong> Обнаружение сбоев до того, как они повлияют на пользователей. <br><strong>Ключевые артефакты:</strong> Регламент обработки оповещений, Матрица критичных порогов. <br><strong>Процесс:</strong> Настройка порогов (Thresholds) в Zabbix/Prometheus → Тюнинг для снижения "шума" → Автоматическая регистрация P1/P2 инцидентов.' },
+            { id: 'catalog', name: 'Управление каталогом услуг', startMonth: 3, details: '<strong>Цель:</strong> Предоставление пользователям стандартизированного списка IT-услуг. <br><strong>Ключевые артефакты:</strong> Финальный документ "Каталог Услуг", Набор шаблонов в Service Desk. <br><strong>Процесс:</strong> Группировка услуг → Описание (SLA, исполнитель) → Публикация на Портале самообслуживания.' },
+            { id: 'knowledge', name: 'Управление знаниями', startMonth: 3, details: '<strong>Цель:</strong> Накопление и использование знаний для повышения FCR. <br><strong>Принцип:</strong> "Решил заявку → Задокументируй решение". <br><strong>Процесс:</strong> L1 создает черновик статьи → L2/Руководитель проверяет → Публикация во внутренней или внешней Базе Знаний.' },
+            { id: 'problem', name: 'Управление проблемами', startMonth: 5, details: '<strong>Цель:</strong> Устранение корневых причин (Root Cause) повторяющихся инцидентов. <br><strong>Ключевые артефакты:</strong> Регламент Problem Management, Шаблон RCA-отчета. <br><strong>Процесс:</strong> Регистрация Проблемы (Problem Record) → Диагностика (RCA) по методологии "5 Whys" → Разработка обходного решения (Workaround) → Создание Запроса на изменение (CR).' },
+            { id: 'change', name: 'Управление изменениями', startMonth: 7, details: '<strong>Цель:</strong> Контроль всех изменений в IT-среде для минимизации рисков. <br><strong>Ключевые артефакты:</strong> Регламент Change Management, Устав CAB. <br><strong>Процесс:</strong> Создание Запроса на изменение (CR) с планом отката → Оценка рисков Консультативным советом по изменениям (CAB) → Одобрение и внедрение.' },
+            { id: 'itam', name: 'Управление IT-активами', startMonth: 7, details: '<strong>Цель:</strong> Учет, контроль и оптимизация затрат на IT-активы. <br><strong>Ключевые артефакты:</strong> Политика ITAM, Реестр IT-активов (Asset Register). <br><strong>Процесс:</strong> Инвентаризация → Маркировка → Привязка инцидентов к активам в Service Desk → Контроль лицензионного соответствия (Compliance).' },
+            { id: 'cmdb', name: 'Управление конфигурациями', startMonth: 10, details: '<strong>Цель:</strong> Создание логической модели IT-инфраструктуры и взаимосвязей. <br><strong>Ключевые артефакты:</strong> Схема данных CMDB, Регламент ведения CMDB. <br><strong>Процесс:</strong> Определение ТОП-10 критичных IT-сервисов → Определение их компонент (CI) → Построение карты зависимостей.' }
+        ]
+    };
+
+    // Render KPIs
+    data.kpis.forEach(kpi => {
+        new Chart(document.getElementById(kpi.id).getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: [kpi.label],
+                datasets: [{
+                    label: 'Цель',
+                    data: [kpi.value],
+                    backgroundColor: ['#38bdf8'],
+                    borderRadius: 4,
+                }, {
+                    label: 'Остаток',
+                    data: [100 - kpi.value],
+                    backgroundColor: ['#e2e8f0'],
+                    borderRadius: 4,
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { display: false, stacked: true, max: 100 },
+                    y: { display: false, stacked: true }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                }
+            }
+        });
+    });
+
+    // Render Team Chart
+    new Chart(document.getElementById('teamChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: data.team.labels,
+            datasets: [{
+                label: 'Количество сотрудников',
+                data: data.team.data,
+                backgroundColor: ['#60a5fa', '#3b82f6', '#2563eb'],
+                borderColor: '#ffffff',
+                borderWidth: 2,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        afterBody: function(context) {
+                            return data.team.roles[context[0].dataIndex];
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Render Timeline and Processes
+    const timelineContainer = document.getElementById('timeline-container');
+    const processGrid = document.getElementById('process-grid');
+    const processDetails = document.getElementById('process-details');
+    let currentActiveMonth = null;
+    let currentActiveProcess = null;
+
+    function quarterToColor(q) {
+        const colors = {
+            1: 'bg-emerald-100 text-emerald-800',
+            2: 'bg-sky-100 text-sky-800',
+            3: 'bg-amber-100 text-amber-800',
+            4: 'bg-rose-100 text-rose-800'
+        };
+        return colors[q] || 'bg-slate-100 text-slate-800';
+    }
+    
+    function quarterToBorderColor(q) {
+        const colors = {
+            1: 'border-emerald-500',
+            2: 'border-sky-500',
+            3: 'border-amber-500',
+            4: 'border-rose-500'
+        };
+        return colors[q] || 'border-slate-500';
+    }
+
+
+    function updateProcessDetails(processId) {
+        const process = data.processes.find(p => p.id === processId);
+        if (process) {
+            processDetails.style.opacity = '0';
+            setTimeout(() => {
+                processDetails.innerHTML = `
+                    <h3 class="text-xl font-bold mb-2 text-slate-900">${process.name}</h3>
+                    <div class="text-sm font-medium text-white bg-sky-500 px-2 py-1 rounded-full inline-block mb-4">Старт: Месяц ${process.startMonth}</div>
+                    <p class="text-slate-700 leading-relaxed">${process.details}</p>
+                `;
+                processDetails.style.opacity = '1';
+            }, 300);
+
+            // Update active card
+            if (currentActiveProcess) {
+                currentActiveProcess.classList.remove('active');
+            }
+            const newActiveCard = document.querySelector(`.process-card[data-id="${processId}"]`);
+            if (newActiveCard) {
+                newActiveCard.classList.add('active');
+                currentActiveProcess = newActiveCard;
+            }
+        }
+    }
+    
+    data.timeline.forEach(item => {
+        const div = document.createElement('div');
+        div.className = `timeline-item p-4 rounded-lg shadow border-l-4 ${quarterToBorderColor(item.quarter)} ${quarterToColor(item.quarter)}`;
+        div.dataset.month = item.month;
+        div.innerHTML = `
+            <div class="flex justify-between items-center mb-1">
+                <div class="font-bold text-lg">${item.name}</div>
+                <div class="text-sm font-semibold">Q${item.quarter}</div>
+            </div>
+            <div class="text-sm font-medium mb-2">${item.focus}</div>
+            <p class="text-xs">${item.tasks}</p>
+        `;
+        div.addEventListener('click', () => {
+            if (currentActiveMonth) {
+                currentActiveMonth.classList.remove('active', 'bg-white');
+                currentActiveMonth.classList.add(quarterToColor(parseInt(currentActiveMonth.dataset.quarter)));
+            }
+            div.classList.add('active', 'bg-white');
+            div.classList.remove(quarterToColor(item.quarter));
+            currentActiveMonth = div;
+            
+            const firstProcessOfMonth = data.processes.find(p => p.startMonth === item.month);
+            if (firstProcessOfMonth) {
+                updateProcessDetails(firstProcessOfMonth.id);
+            }
+        });
+        timelineContainer.appendChild(div);
+    });
+
+    data.processes.forEach(process => {
+        const card = document.createElement('div');
+        card.className = 'process-card bg-white p-3 rounded-lg shadow border-2 border-transparent text-center';
+        card.dataset.id = process.id;
+        card.innerHTML = `
+            <h4 class="font-semibold text-sm">${process.name}</h4>
+            <p class="text-xs text-slate-500">Старт: M${process.startMonth}</p>
+        `;
+        card.addEventListener('click', () => {
+            updateProcessDetails(process.id);
+        });
+        processGrid.appendChild(card);
+    });
+
+    // Set initial state
+    const firstMonthEl = document.querySelector('.timeline-item[data-month="1"]');
+    if(firstMonthEl) firstMonthEl.click();
+});
+</script>
+
+</body>
+</html>
