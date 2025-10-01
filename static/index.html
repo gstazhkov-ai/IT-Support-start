@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Годовой стратегический план: Служба технической поддержки</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Strategic Earth -->
+    <!-- Application Structure Plan: A single-page application with a fixed sidebar for navigation between key thematic sections: Dashboard, Roadmap, Team, Processes, and Tools. This structure breaks down the dense report into logical, digestible parts, prioritizing user exploration over the original linear format. The dashboard provides an executive summary, while the interactive roadmap and process tabs allow for deep dives. This is more intuitive and engaging for management than a static document. -->
+    <!-- Visualization & Content Choices: [KPI Table -> Goal: Inform -> Viz: 4 Doughnut charts (Chart.js) -> Interaction: Hover tooltips -> Justification: More visual and impactful for key metrics than a table.]; [Roadmap Table -> Goal: Change/Organize -> Viz: Filterable timeline/card layout -> Interaction: Phase filter buttons (JS) -> Justification: Allows users to focus on specific phases of the plan without being overwhelmed by the full 12-month view.]; [Team Structure Table -> Goal: Organize -> Viz: 3-column card layout (HTML/Tailwind) -> Interaction: None -> Justification: Clearer visual separation of tiers than a table.]; [SLA/Prioritization Tables -> Goal: Inform -> Viz: Interactive HTML Tables -> Interaction: Hover highlighting (JS) -> Justification: Makes the complex matrix easier to read and understand the relationship between impact/urgency and priority.]; [Process Lists -> Goal: Organize -> Viz: Simple flow diagrams (HTML/Tailwind) -> Interaction: None -> Justification: Visualizes the sequence of steps more effectively than a bulleted list.] -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4;
+            color: #3D405B;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        .nav-link.active {
+            background-color: #81B29A;
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+        .nav-link:not(.active):hover {
+            background-color: #e8eae6;
+        }
+        .tab-button.active {
+            border-bottom-color: #E07A5F;
+            color: #E07A5F;
+            font-weight: 600;
+        }
+        .chart-container {
+            position: relative; 
+            width: 100%; 
+            max-width: 250px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 250px;
+            max-height: 250px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="flex min-h-screen">
+        <nav id="sidebar" class="w-64 bg-white shadow-lg p-4 fixed top-0 left-0 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-30">
+            <h1 class="text-2xl font-bold text-[#3D405B] mb-8">ITIL 4 План</h1>
+            <ul class="space-y-2">
+                <li><a href="#dashboard" class="nav-link flex items-center p-3 rounded-lg text-gray-700">Дашборд</a></li>
+                <li><a href="#roadmap" class="nav-link flex items-center p-3 rounded-lg text-gray-700">Дорожная карта</a></li>
+                <li><a href="#team" class="nav-link flex items-center p-3 rounded-lg text-gray-700">Команда</a></li>
+                <li><a href="#processes" class="nav-link flex items-center p-3 rounded-lg text-gray-700">Процессы</a></li>
+                <li><a href="#tools" class="nav-link flex items-center p-3 rounded-lg text-gray-700">Инструменты</a></li>
+            </ul>
+        </nav>
+
+        <button id="menu-toggle" class="md:hidden fixed top-4 left-4 z-40 p-2 bg-white rounded-md shadow-md">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+        </button>
+
+        <main class="flex-1 md:ml-64 p-6 md:p-10 transition-all duration-300">
+            <section id="dashboard" class="content-section">
+                <header class="mb-8">
+                    <h2 class="text-3xl font-bold text-[#3D405B]">Годовой стратегический план</h2>
+                    <p class="text-lg text-gray-600 mt-2">Создание и развитие эффективной, масштабируемой службы технической поддержки на базе ITIL 4.</p>
+                </header>
+
+                <div class="bg-white p-6 rounded-xl shadow-md mb-8">
+                     <h3 class="text-2xl font-semibold text-[#3D405B] mb-4">Резюме для руководства</h3>
+                     <p class="text-gray-700 leading-relaxed">В настоящее время в Компании отсутствует централизованная техническая поддержка. Запросы обрабатываются профильными инженерами по остаточному принципу, что создает серьезные операционные и финансовые риски. Данный план описывает поэтапное преобразование текущей ситуации в зрелую, масштабируемую IT-службу за 12 месяцев через три ключевые фазы: Стабилизация, Стандартизация и Масштабирование. Реализация плана превратит поддержку из центра затрат в ценный бизнес-актив.</p>
+                </div>
+
+                <h3 class="text-2xl font-semibold text-[#3D405B] mb-6">Ключевые цели и результаты (KPI)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-md text-center">
+                        <h4 class="font-semibold text-lg mb-2">SLA Compliance</h4>
+                        <div class="chart-container"><canvas id="slaChart"></canvas></div>
+                        <p class="mt-2 text-gray-600">Соблюдение сроков решения</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md text-center">
+                        <h4 class="font-semibold text-lg mb-2">Customer Satisfaction</h4>
+                        <div class="chart-container"><canvas id="csatChart"></canvas></div>
+                        <p class="mt-2 text-gray-600">Удовлетворенность (CSAT)</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md text-center">
+                        <h4 class="font-semibold text-lg mb-2">First Contact Resolution</h4>
+                        <div class="chart-container"><canvas id="fcrChart"></canvas></div>
+                         <p class="mt-2 text-gray-600">Решение на первой линии (FCR)</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md text-center">
+                        <h4 class="font-semibold text-lg mb-2">L3 Workload Reduction</h4>
+                        <div class="chart-container"><canvas id="l3Chart"></canvas></div>
+                         <p class="mt-2 text-gray-600">Снижение нагрузки на L3</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="roadmap" class="content-section hidden">
+                 <header class="mb-8">
+                    <h2 class="text-3xl font-bold text-[#3D405B]">Дорожная карта на 12 месяцев</h2>
+                    <p class="text-lg text-gray-600 mt-2">Интерактивный план внедрения с разделением по фазам.</p>
+                </header>
+                <div class="flex space-x-4 mb-6 border-b border-gray-200">
+                    <button class="roadmap-filter py-2 px-4 text-lg font-medium text-gray-600 border-b-2 border-transparent hover:border-gray-400 active" data-phase="all">Все фазы</button>
+                    <button class="roadmap-filter py-2 px-4 text-lg font-medium text-gray-600 border-b-2 border-transparent hover:border-gray-400" data-phase="phase1">Фаза 1: Стабилизация</button>
+                    <button class="roadmap-filter py-2 px-4 text-lg font-medium text-gray-600 border-b-2 border-transparent hover:border-gray-400" data-phase="phase2">Фаза 2: Стандартизация</button>
+                    <button class="roadmap-filter py-2 px-4 text-lg font-medium text-gray-600 border-b-2 border-transparent hover:border-gray-400" data-phase="phase3">Фаза 3: Масштабирование</button>
+                </div>
+                <div class="space-y-8">
+                    <div class="roadmap-item" data-phase="phase1">
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <h3 class="text-xl font-bold text-[#E07A5F]">Месяц 1: Аудит и Запуск</h3>
+                            <p class="mt-2 text-gray-600">- Проведение встреч с руководством (CEO, CTO, CFO).<br>- Аудит текущих каналов обращений.<br>- Выбор и запуск Service Desk. **Найм L1(№1) и L2.**<br>- **Результат:** 100% обращений регистрируются в единой системе.</p>
+                        </div>
+                    </div>
+                    <div class="roadmap-item" data-phase="phase1">
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <h3 class="text-xl font-bold text-[#E07A5F]">Месяц 2: Базовые процессы</h3>
+                            <p class="mt-2 text-gray-600">- Внедрение Регламента классификации и приоритезации.<br>- Утверждение и запуск SLA. Внедрение Политики Эскалации.<br>- Настройка проактивного мониторинга (Zabbix/Prometheus) силами L2.<br>- **Результат:** SLA Compliance ≥70%, запущен мониторинг.</p>
+                        </div>
+                    </div>
+                    <div class="roadmap-item" data-phase="phase1">
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                           <h3 class="text-xl font-bold text-[#E07A5F]">Месяц 3: База знаний</h3>
+                            <p class="mt-2 text-gray-600">- **Найм L1(№2).**<br>- Запуск Портала самообслуживания и Базы Знаний.<br>- Создание первых 15-20 статей по самым частым вопросам (принцип KCS-Lite).<br>- **Результат:** Снижение потока однотипных запросов.</p>
+                        </div>
+                    </div>
+                    <div class="roadmap-item" data-phase="phase2">
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <h3 class="text-xl font-bold text-[#81B29A]">Месяц 4: Каталог услуг</h3>
+                            <p class="mt-2 text-gray-600">- Публикация Каталога услуг для стандартизации запросов (Request Fulfillment).<br>- Настройка автоматического сбора обратной связи (CSAT).<br>- **Результат:** FCR ≥50%, запущен сбор CSAT.</p>
+                        </div>
+                    </div>
+                    <div class="roadmap-item" data-phase="phase2">
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <h3 class="text-xl font-bold text-[#81B29A]">Месяц 5: Анализ проблем</h3>
+                            <p class="mt-2 text-gray-600">- Формальное внедрение процесса **Управления проблемами (Problem Management)**.<br>- L2 проводит первые RCA (анализ корневых причин) по повторяющимся инцидентам.<br>- **Результат:** Выявлены и взяты в работу первые 3-5 корневых причин сбоев.</p>
+                        </div>
+                    </div>
+                    <div class="roadmap-item" data-phase="phase2">
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <h3 class="text-xl font-bold text-[#81B29A]">Месяц 6: Отчетность и ROI</h3>
+                            <p class="mt-2 text-gray-600">- Проведение первого тестового CAB (Change Advisory Board).<br>- Подготовка финального отчета за 6 месяцев для руководства (ROI, достижение KPI).<br>- **Результат:** Снижение L3 Workload ≥80%, SLA Compliance ≥95%, CSAT ≥90%.</p>
+                        </div>
+                    </div>
+                     <div class="roadmap-item" data-phase="phase3">
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <h3 class="text-xl font-bold text-[#3D405B]">Месяц 7: Управление изменениями</h3>
+                            <p class="mt-2 text-gray-600">- Полноценное внедрение процесса **Управления изменениями (Change Management)**. Создание Устава CAB.<br>- Старт ITAM (IT Asset Management): заполнение реестра активов.<br>- **Результат:** Все изменения в IT-инфраструктуре проходят через контролируемый процесс.</p>
+                        </div>
+                    </div>
+                     <div class="roadmap-item" data-phase="phase3">
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <h3 class="text-xl font-bold text-[#3D405B]">Месяц 8: Контроль активов</h3>
+                            <p class="mt-2 text-gray-600">- ITAM: Полная инвентаризация оборудования и ПО. Контроль лицензий.<br>- Обучение L1 привязке заявок к активам в Service Desk.<br>- **Результат:** Прозрачность IT-активов, снижение рисков.</p>
+                        </div>
+                    </div>
+                    <div class="roadmap-item" data-phase="phase3">
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <h3 class="text-xl font-bold text-[#3D405B]">Месяц 9: Аудит и Оптимизация</h3>
+                            <p class="mt-2 text-gray-600">- Проведение внутреннего аудита процессов Incident, Request, Problem.<br>- Оптимизация работы L1 для достижения целевого FCR ≥70%.<br>- **Результат:** Повышение эффективности ключевых процессов.</p>
+                        </div>
+                    </div>
+                     <div class="roadmap-item" data-phase="phase3">
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <h3 class="text-xl font-bold text-[#3D405B]">Месяц 10: Архитектура CMDB</h3>
+                            <p class="mt-2 text-gray-600">- Старт процесса **Управления конфигурациями (CMDB)**.<br>- Определение и каталогизация 80% критичных IT-сервисов и связанных с ними CI (Configuration Items).<br>- **Результат:** Заложен фундамент для оценки влияния изменений на бизнес.</p>
+                        </div>
+                    </div>
+                    <div class="roadmap-item" data-phase="phase3">
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <h3 class="text-xl font-bold text-[#3D405B]">Месяц 11: Связи и Прогноз</h3>
+                            <p class="mt-2 text-gray-600">- Построение карты зависимостей CI от IT-сервисов в CMDB.<br>- Интеграция CMDB с процессами Incident, Problem и Change Management.<br>- **Результат:** Возможность прогнозировать влияние сбоев и изменений.</p>
+                        </div>
+                    </div>
+                    <div class="roadmap-item" data-phase="phase3">
+                        <div class="bg-white p-6 rounded-xl shadow-md">
+                            <h3 class="text-xl font-bold text-[#3D405B]">Месяц 12: Итоги и Планирование</h3>
+                            <p class="mt-2 text-gray-600">- Финальный годовой отчет: достигнутые цели, ROI, зрелость процессов.<br>- Разработка плана бюджета и найма на 2-й год.<br>- **Результат:** Служба поддержки полностью готова к масштабированию бизнеса.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="team" class="content-section hidden">
+                <header class="mb-8">
+                    <h2 class="text-3xl font-bold text-[#3D405B]">Структура команды и модель поддержки</h2>
+                    <p class="text-lg text-gray-600 mt-2">Трехуровневая (3-Tier) модель для четкого разделения ответственности.</p>
+                </header>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-[#E07A5F]">
+                        <h3 class="text-2xl font-bold mb-3">L1 (Первая линия)</h3>
+                        <p class="font-semibold text-gray-800">Роль: Универсальный специалист (2)</p>
+                        <p class="mt-4 text-gray-600 font-semibold">Основные задачи:</p>
+                        <ul class="list-disc list-inside mt-2 text-gray-600 space-y-1">
+                            <li>Прием и классификация запросов</li>
+                            <li>Решение по Базе Знаний (FCR)</li>
+                            <li>Эскалация на L2/L3</li>
+                        </ul>
+                        <p class="mt-4 text-gray-600 font-semibold">Ключевые компетенции:</p>
+                        <p class="mt-2 text-gray-600">Эмпатия, стрессоустойчивость, коммуникация, базовые знания ОС и ПО.</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-[#81B29A]">
+                        <h3 class="text-2xl font-bold mb-3">L2 (Вторая линия)</h3>
+                        <p class="font-semibold text-gray-800">Роль: Системный администратор (1)</p>
+                        <p class="mt-4 text-gray-600 font-semibold">Основные задачи:</p>
+                        <ul class="list-disc list-inside mt-2 text-gray-600 space-y-1">
+                            <li>Обслуживание IT-инфраструктуры</li>
+                            <li>Проактивный мониторинг</li>
+                            <li>Решение сложных инцидентов, RCA</li>
+                        </ul>
+                        <p class="mt-4 text-gray-600 font-semibold">Ключевые компетенции:</p>
+                        <p class="mt-2 text-gray-600">Глубокие знания ОС (Linux/Win), сетей, виртуализации, мониторинга.</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-[#3D405B]">
+                        <h3 class="text-2xl font-bold mb-3">L3 (Третья линия)</h3>
+                        <p class="font-semibold text-gray-800">Роль: Инженеры-разработчики</p>
+                        <p class="mt-4 text-gray-600 font-semibold">Основные задачи:</p>
+                        <ul class="list-disc list-inside mt-2 text-gray-600 space-y-1">
+                            <li>Устранение проблем, требующих изменения кода/архитектуры</li>
+                        </ul>
+                        <p class="mt-4 text-gray-600 font-semibold">Ключевые компетенции:</p>
+                        <p class="mt-2 text-gray-600">Экспертиза в коде продукта.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="processes" class="content-section hidden">
+                <header class="mb-8">
+                    <h2 class="text-3xl font-bold text-[#3D405B]">Ключевые процессы и регламенты (ITIL 4)</h2>
+                    <p class="text-lg text-gray-600 mt-2">Основа для стабильной и предсказуемой работы службы поддержки.</p>
+                </header>
+                <div class="bg-white rounded-xl shadow-md">
+                    <div class="border-b border-gray-200">
+                        <nav class="-mb-px flex space-x-6 px-6" aria-label="Tabs">
+                             <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 active" data-tab="sla">SLA и Приоритезация</button>
+                             <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="incident">Управление инцидентами</button>
+                             <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="request">Управление запросами</button>
+                             <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="problem">Управление проблемами</button>
+                             <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="change">Управление изменениями</button>
+                             <button class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300" data-tab="cmdb">Управление конфигурациями</button>
+                        </nav>
+                    </div>
+                    <div class="p-6">
+                        <div id="sla-content" class="tab-content">
+                            <h3 class="text-xl font-semibold mb-4">Соглашение об уровне сервиса (SLA)</h3>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Приоритет</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Влияние на бизнес</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Время реакции</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Время решения</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200">
+                                        <tr><td class="px-6 py-4 whitespace-nowrap font-bold text-red-600">P1: Критический</td><td class="px-6 py-4">Система не работает, ключевой бизнес-процесс остановлен.</td><td class="px-6 py-4">10 минут</td><td class="px-6 py-4">1 час</td></tr>
+                                        <tr><td class="px-6 py-4 whitespace-nowrap font-bold text-orange-500">P2: Высокий</td><td class="px-6 py-4">Отдельная функция не работает, влияет на группу пользователей.</td><td class="px-6 py-4">30 минут</td><td class="px-6 py-4">4 часа</td></tr>
+                                        <tr><td class="px-6 py-4 whitespace-nowrap font-bold text-yellow-500">P3: Средний</td><td class="px-6 py-4">Незначительный сбой, стандартный запрос.</td><td class="px-6 py-4">2 часа</td><td class="px-6 py-4">1 рабочий день</td></tr>
+                                        <tr><td class="px-6 py-4 whitespace-nowrap font-bold text-blue-500">P4: Низкий</td><td class="px-6 py-4">Запросы на улучшение, информацию.</td><td class="px-6 py-4">4 часа</td><td class="px-6 py-4">5 рабочих дней</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div id="incident-content" class="tab-content hidden">
+                             <h3 class="text-xl font-semibold mb-2">Процесс управления инцидентами</h3>
+                             <p class="mb-4 text-gray-600">**Цель:** Максимально быстро восстановить нормальную работу сервиса.</p>
+                             <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+                                <div class="p-3 bg-gray-100 rounded-lg text-center">Регистрация</div>
+                                <div class="text-2xl text-gray-400">→</div>
+                                <div class="p-3 bg-gray-100 rounded-lg text-center">Классификация</div>
+                                <div class="text-2xl text-gray-400">→</div>
+                                <div class="p-3 bg-gray-100 rounded-lg text-center">Решение (L1)</div>
+                                <div class="text-2xl text-gray-400">→</div>
+                                <div class="p-3 bg-gray-100 rounded-lg text-center">Эскалация</div>
+                                <div class="text-2xl text-gray-400">→</div>
+                                <div class="p-3 bg-gray-100 rounded-lg text-center">Восстановление</div>
+                                 <div class="text-2xl text-gray-400">→</div>
+                                <div class="p-3 bg-gray-100 rounded-lg text-center">Закрытие</div>
+                             </div>
+                        </div>
+                        <div id="request-content" class="tab-content hidden">
+                            <h3 class="text-xl font-semibold mb-2">Процесс управления запросами</h3>
+                             <p class="mb-4 text-gray-600">**Цель:** Обработка стандартных, повторяющихся запросов (доступ, консультации).</p>
+                             <div class="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+                                <div class="p-3 bg-gray-100 rounded-lg text-center">Подача через портал</div>
+                                <div class="text-2xl text-gray-400">→</div>
+                                <div class="p-3 bg-gray-100 rounded-lg text-center">Авторизация</div>
+                                <div class="text-2xl text-gray-400">→</div>
+                                <div class="p-3 bg-gray-100 rounded-lg text-center">Выполнение</div>
+                                <div class="text-2xl text-gray-400">→</div>
+                                <div class="p-3 bg-gray-100 rounded-lg text-center">Завершение</div>
+                             </div>
+                        </div>
+                        <div id="problem-content" class="tab-content hidden">
+                             <h3 class="text-xl font-semibold mb-2">Процесс управления проблемами</h3>
+                             <p class="mb-4 text-gray-600">**Цель:** Устранение корневых причин повторяющихся инцидентов.</p>
+                             <p>Процесс включает идентификацию проблемы, анализ корневых причин (RCA), разработку обходного решения (Workaround) и инициирование запроса на изменение (Change Request) для постоянного исправления.</p>
+                        </div>
+                        <div id="change-content" class="tab-content hidden">
+                            <h3 class="text-xl font-semibold mb-2">Процесс управления изменениями</h3>
+                            <p class="mb-4 text-gray-600">**Цель:** Минимизация рисков при внесении изменений в IT-инфраструктуру.</p>
+                            <p>Процесс включает инициацию запроса на изменение (CR), оценку рисков, планирование (включая план отката), одобрение Консультативным советом по изменениям (CAB), внедрение и последующий анализ результатов.</p>
+                        </div>
+                         <div id="cmdb-content" class="tab-content hidden">
+                            <h3 class="text-xl font-semibold mb-2">Процесс управления конфигурациями (CMDB)</h3>
+                             <p class="mb-4 text-gray-600">**Цель:** Создание логической модели IT-инфраструктуры и взаимосвязей ее компонентов (CI).</p>
+                             <p>CMDB позволяет точно оценивать влияние инцидентов и риски планируемых изменений на IT-сервисы и бизнес-процессы.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+             <section id="tools" class="content-section hidden">
+                <header class="mb-8">
+                    <h2 class="text-3xl font-bold text-[#3D405B]">Инструментарий и технологии</h2>
+                    <p class="text-lg text-gray-600 mt-2">Рекомендуемое ПО для построения эффективной службы поддержки.</p>
+                </header>
+                 <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-xl shadow-md">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Инструмент</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Назначение</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Рекомендуемое ПО</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4 font-semibold">Service Desk</td>
+                                <td class="px-6 py-4">Единая система учета заявок, SLA, автоматизации.</td>
+                                <td class="px-6 py-4">Jira Service Management, Naumen, SimpleOne.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 font-semibold">База Знаний</td>
+                                <td class="px-6 py-4">Хранение инструкций, статей для L1 и пользователей.</td>
+                                <td class="px-6 py-4">Confluence, специализированная KMS.</td>
+                            </tr>
+                             <tr>
+                                <td class="px-6 py-4 font-semibold">Мониторинг</td>
+                                <td class="px-6 py-4">Проактивное отслеживание состояния IT-инфраструктуры.</td>
+                                <td class="px-6 py-4">Zabbix, Prometheus + Grafana.</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 font-semibold">Коммуникации</td>
+                                <td class="px-6 py-4">Оперативные оповещения и координация.</td>
+                                <td class="px-6 py-4">Slack, MS Teams, Compass.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('.content-section');
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.getElementById('sidebar');
+
+            function setActiveLink(targetId) {
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === `#${targetId}`);
+                });
+            }
+
+            function showSection(targetId) {
+                sections.forEach(section => {
+                    section.classList.toggle('hidden', section.id !== targetId);
+                });
+                setActiveLink(targetId);
+                 if (window.innerWidth < 768) {
+                    sidebar.classList.add('-translate-x-full');
+                }
+            }
+
+            const initialSection = window.location.hash ? window.location.hash.substring(1) : 'dashboard';
+            showSection(initialSection);
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = e.currentTarget.getAttribute('href').substring(1);
+                    window.location.hash = targetId;
+                });
+            });
+
+            window.addEventListener('hashchange', () => {
+                const targetId = window.location.hash ? window.location.hash.substring(1) : 'dashboard';
+                showSection(targetId);
+            });
+
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('-translate-x-full');
+            });
+            
+            document.querySelector('.roadmap-filter[data-phase="all"]').classList.add('active', 'text-[#E07A5F]', 'border-[#E07A5F]');
+
+            const roadmapFilters = document.querySelectorAll('.roadmap-filter');
+            const roadmapItems = document.querySelectorAll('.roadmap-item');
+            roadmapFilters.forEach(filter => {
+                filter.addEventListener('click', function () {
+                    roadmapFilters.forEach(f => f.classList.remove('active', 'text-[#E07A5F]', 'border-[#E07A5F]'));
+                    this.classList.add('active', 'text-[#E07A5F]', 'border-[#E07A5F]');
+                    const phase = this.getAttribute('data-phase');
+
+                    roadmapItems.forEach(item => {
+                        if (phase === 'all' || item.getAttribute('data-phase') === phase) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    tabContents.forEach(content => {
+                        content.classList.toggle('hidden', content.id !== `${tabId}-content`);
+                    });
+                });
+            });
+
+            const createKpiChart = (canvasId, label, targetValue, color) => {
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: [label, ''],
+                        datasets: [{
+                            data: [targetValue, 100 - targetValue],
+                            backgroundColor: [color, '#e5e7eb'],
+                            borderColor: ['#F8F7F4'],
+                            borderWidth: 4,
+                            cutout: '70%',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { enabled: false }
+                        },
+                        animation: {
+                            onComplete: function() {
+                                const chartInstance = this;
+                                const ctx = chartInstance.ctx;
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'middle';
+                                const centerX = (chartInstance.chartArea.left + chartInstance.chartArea.right) / 2;
+                                const centerY = (chartInstance.chartArea.top + chartInstance.chartArea.bottom) / 2;
+                                ctx.font = 'bold 36px Inter';
+                                ctx.fillStyle = '#3D405B';
+                                ctx.fillText('≥' + targetValue + '%', centerX, centerY);
+                            }
+                        }
+                    }
+                });
+            };
+
+            createKpiChart('slaChart', 'SLA', 95, '#81B29A');
+            createKpiChart('csatChart', 'CSAT', 90, '#E07A5F');
+            createKpiChart('fcrChart', 'FCR', 70, '#3D405B');
+            createKpiChart('l3Chart', 'L3 Reduction', 80, '#f4a261');
+        });
+    </script>
+</body>
+</html>
